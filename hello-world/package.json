@@ -1,0 +1,10 @@
+{
+    "name": "hello-world",
+    "version": "1.0.0",
+    "devDependencies": {
+        "electron": "^32.0.1"
+    },
+    "scripts": {
+        "start": "electron ."
+    }
+}
