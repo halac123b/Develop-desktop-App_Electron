@@ -1,5 +1,6 @@
 console.log("Hello");
 
+const { create } = require("domain");
 const electron = require("electron");
 const app = electron.app;   // App instance from electron module
 
@@ -22,4 +23,29 @@ function createWindow() {
         // Thêm // vào sau tên protocol (file://)
         slashes: true
     }));
+
+    // on(): gắn event cho window
+    /// closed: event khi đóng window
+    win.on("closed", () => {
+        win = null;
+    });
 }
+
+// Gắn event khi module electron đã init xong và ready
+app.on("ready", createWindow);
+
+// event: window-all-closed: khi tắt cả window bị close hết, sẽ quit()
+/// Nhưng trừ MacOS, vì OS này k thoát app (tên platform là darwin)
+/// process: 1 class global của Node có thể dùng bất kì đâu
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
+});
+
+// 1 loại event riêng của Mac, mở app có sẵn khi tất cả window đã đóng rồi
+app.on("activate", () => {
+    if (win === null) {
+        createWindow();
+    }
+});
