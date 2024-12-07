@@ -1,5 +1,3 @@
-console.log("Hello");
-
 const { create } = require("domain");
 const electron = require("electron");
 const app = electron.app;   // App instance from electron module
@@ -8,6 +6,8 @@ const path = require("path");
 const url = require("url");
 
 let win;
+
+console.log("From main.js");
 
 function createWindow() {
     // Class của window cho phép present nội dung từ trang web như trên browser
@@ -23,6 +23,9 @@ function createWindow() {
         // Thêm // vào sau tên protocol (file://)
         slashes: true
     }));
+
+    // Open dev tool giống trên Chrome
+    win.webContents.openDevTools();
 
     // on(): gắn event cho window
     /// closed: event khi đóng window
