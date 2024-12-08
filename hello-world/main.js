@@ -6,12 +6,24 @@ const path = require("path");
 const url = require("url");
 
 let win;
+// let parentWin;
 
 console.log("From main.js");
 
 function createWindow() {
     // Class của window cho phép present nội dung từ trang web như trên browser
-    win = new electron.BrowserWindow();
+    // parentWin = new electron.BrowserWindow();
+    win = new electron.BrowserWindow(
+        {
+            title: "Browser Window",
+            width: 400, height: 400, maxWidth: 600, maxHeight: 600,
+            backgroundColor: "#228b22",
+            frame: false,    // Window borderless, k có toolbar, các nút nhấn
+            // Window con luôn nằm đè lên win cha, modal: khi mở win con, win cha k tương tác đc
+            // parent: parentWin, modal: true,
+            show: false // Window sau khi đc tạo ra cũng chưa đc show
+        }
+    );
     // Load url nội dung cần đc window hiển thị
     win.loadURL(url.format({
         // Protocol sử dụng để access url
@@ -24,8 +36,16 @@ function createWindow() {
         slashes: true
     }));
 
+    // win.loadURL("https://github.com/");
+
+    // Trigger event chỉ 1 lần, nếu có lần sau k trigger nữa
+    // Event sau khi website đã đc load xog
+    win.once("ready-to-show", () => {
+        win.show();
+    });
+
     // Open dev tool giống trên Chrome
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 
     // on(): gắn event cho window
     /// closed: event khi đóng window
