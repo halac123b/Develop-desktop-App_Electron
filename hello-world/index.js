@@ -1,5 +1,8 @@
 console.log("From index.js");
 
+const electron = require("electron");
+const ipc = electron.ipcRenderer;
+
 fetch("https://zenquotes.io/api/quotes")
     .then((response) => response.json()) // Parse the JSON response
     .then((data) => {
@@ -8,3 +11,10 @@ fetch("https://zenquotes.io/api/quotes")
         document.getElementById("quote").innerHTML = firstQuote[0].q;
     })
     .catch((error) => console.error("Error fetching quotes:", error));
+
+const errBtn = document.getElementById("errBtn");
+errBtn.addEventListener("click", function () {
+    console.log("haha");
+    // Send IPC msg đến main thread tại channel đc chọn
+    ipc.send("open-error-dialog");
+});

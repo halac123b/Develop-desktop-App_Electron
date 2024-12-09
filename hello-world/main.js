@@ -5,6 +5,13 @@ const app = electron.app;   // App instance from electron module
 const path = require("path");
 const url = require("url");
 
+// IPC: internal process comunicate, thực hiện việc liên lạc giữa các process
+/// Điều này đặc biệt cần khi render process cần gọi các API native của OS, tồn tại nhiều rủi ro
+/// Để dễ quản lí, các API native đều đc đưa về main process để thực hiện
+const ipc = electron.ipcMain;
+
+const dialog = electron.dialog;
+
 let win;
 // let parentWin;
 
@@ -21,7 +28,18 @@ function createWindow() {
             frame: false,    // Window borderless, k có toolbar, các nút nhấn
             // Window con luôn nằm đè lên win cha, modal: khi mở win con, win cha k tương tác đc
             // parent: parentWin, modal: true,
-            show: false // Window sau khi đc tạo ra cũng chưa đc show
+            show: false, // Window sau khi đc tạo ra cũng chưa đc show
+            webPreferences: {
+                // Cho phép code của Render process (frontend) sử dụng code NodeJS
+                /// Code frontend browser bên web chắc chắn k cho dùng Node, vì sẽ cho phép access vào file rất nguy hiểm
+                /// Nhưng đây là file tự chạy trên local của mình nên đỡ hơn
+                /// Dù vậy Electron cũng khuyến nghị k dùng
+                nodeIntegration: true,
+                // Vì security, Electron đã cho render process và preload script chạy trong 2 context khác nhau và k thể đc sử dụng song song
+                /// vd: nếu ta set nodeIntegration cho render, thì vì context vẫn bị tách ra nên code Node k thể chạy
+                /// khi set này về false, context của render có thể access đc code của Electron và Node
+                contextIsolation: false,
+            }
         }
     );
     // Load url nội dung cần đc window hiển thị
@@ -71,4 +89,10 @@ app.on("activate", () => {
     if (win === null) {
         createWindow();
     }
+});
+
+// Register event cho main IPC
+ipc.on("open-error-dialog", () => {
+    // Open error popup (1: title, 2: content)
+    dialog.showErrorBox("An error message", "Demo of an error msg");
 });
